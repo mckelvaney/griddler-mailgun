@@ -81,14 +81,39 @@ module Griddler
 
       def attachment_files
         if params["attachment-count"].present?
-          attachment_count = params["attachment-count"].to_i
-
-          attachment_count.times.map do |index|
-            params.delete("attachment-#{index+1}")
-          end
+          process_attachments
+        elsif has_body_calendar_invite?
+          process_attachments.concat(process_calendar_invite)
         else
           params["attachments"] || []
         end
+      end
+
+      def process_attachments
+        attachment_count = params["attachment-count"].to_i
+
+        attachment_count.times.map do |index|
+          params.delete("attachment-#{index+1}")
+        end
+      end
+
+      def process_calendar_invite
+        file = Tempfile.open(['invite', '.ics']) do |f|
+          f.puts params['body-calendar']
+          f
+        end
+
+        [
+          ActionDispatch::Http::UploadedFile.new(
+            filename: 'invite.ics',
+            type: 'text/calendar',
+            tempfile: file
+          )
+        ]
+      end
+
+      def has_body_calendar_invite?
+        params['body-calendar'].present?
       end
     end
   end

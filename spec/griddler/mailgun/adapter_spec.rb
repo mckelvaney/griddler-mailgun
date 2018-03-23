@@ -39,6 +39,12 @@ describe Griddler::Mailgun::Adapter, '.normalize_params' do
     expect(normalized_params[:attachments].length).to eq 2
   end
 
+  it "extracts calendar attachement from body" do
+    params = default_params.merge(calendar_param)
+    normalized_params = Griddler::Mailgun::Adapter.normalize_params(params)
+    expect(normalized_params[:attachments].length).to eq 1
+  end
+
   it 'has no attachments' do
     normalized_params = Griddler::Mailgun::Adapter.normalize_params(default_params)
     expect(normalized_params[:attachments]).to be_empty
@@ -158,5 +164,13 @@ describe Griddler::Mailgun::Adapter, '.normalize_params' do
         "message-headers"=>json_headers
       }
     )
+  end
+
+  def calendar_param
+    {"body-calendar" => calendar_invite_to_string}
+  end
+
+  def calendar_invite_to_string
+    fixture_file('invite.ics').readlines.join
   end
 end
