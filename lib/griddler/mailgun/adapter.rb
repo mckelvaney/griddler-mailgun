@@ -80,10 +80,10 @@ module Griddler
       end
 
       def attachment_files
-        if params["attachment-count"].present?
-          process_attachments
-        elsif has_body_calendar_invite?
+        if body_has_calendar_invite?
           process_attachments.concat(process_calendar_invite)
+        elsif params["attachment-count"].present?
+          process_attachments
         else
           params["attachments"] || []
         end
@@ -98,6 +98,8 @@ module Griddler
       end
 
       def process_calendar_invite
+        return [] unless body_has_calendar_invite?
+
         file = Tempfile.open(['invite', '.ics']) do |f|
           f.puts params['body-calendar']
           f
@@ -112,7 +114,7 @@ module Griddler
         ]
       end
 
-      def has_body_calendar_invite?
+      def body_has_calendar_invite?
         params['body-calendar'].present?
       end
     end
