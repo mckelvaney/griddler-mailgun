@@ -45,6 +45,16 @@ describe Griddler::Mailgun::Adapter, '.normalize_params' do
     expect(normalized_params[:attachments].length).to eq 1
   end
 
+  it "handles attachments and extracting calendar from body" do
+    params = default_params.merge(calendar_param).merge(
+      'attachment-count' => 2,
+      'attachment-1' => upload_1,
+      'attachment-2' => upload_2
+    )
+    normalized_params = Griddler::Mailgun::Adapter.normalize_params(params)
+    expect(normalized_params[:attachments].length).to eq 3
+  end
+
   it 'has no attachments' do
     normalized_params = Griddler::Mailgun::Adapter.normalize_params(default_params)
     expect(normalized_params[:attachments]).to be_empty
