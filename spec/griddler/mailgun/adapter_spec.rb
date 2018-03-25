@@ -177,7 +177,7 @@ describe Griddler::Mailgun::Adapter, '.normalize_params' do
   end
 
   def calendar_param
-    {"body-calendar" => calendar_invite_to_string}
+    { "body-calendar" => calendar_invite_to_string }
   end
 
   def calendar_invite_to_string
