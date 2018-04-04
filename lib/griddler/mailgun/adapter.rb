@@ -99,6 +99,7 @@ module Griddler
 
       def process_calendar_invite
         return [] unless body_has_calendar_invite?
+        return [] if duplicate_invite?
 
         file = Tempfile.open(['invite', '.ics']) do |f|
           f.puts params['body-calendar']
@@ -116,6 +117,23 @@ module Griddler
 
       def body_has_calendar_invite?
         params['body-calendar'].present?
+      end
+
+      def duplicate_invite?
+        search = /(UID:)([0-9A-Z\-]+)/.match(params['body-calendar'])
+        return false unless search
+
+        uid = search[2]
+
+        @attachments.each do |attachment|
+          next unless File.extname(attachment.original_filename) == '.ics'
+
+          File.readlines(attachment.tempfile).each do |l|
+            return true if l =~ /#{uid}/
+          end
+        end
+
+        false
       end
     end
   end
