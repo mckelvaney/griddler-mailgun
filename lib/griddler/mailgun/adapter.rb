@@ -92,7 +92,7 @@ module Griddler
       def process_attachments
         attachment_count = params["attachment-count"].to_i
 
-        attachment_count.times.map do |index|
+        @attachments = attachment_count.times.map do |index|
           params.delete("attachment-#{index+1}")
         end
       end
