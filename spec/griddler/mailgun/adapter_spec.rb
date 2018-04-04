@@ -60,6 +60,16 @@ describe Griddler::Mailgun::Adapter, '.normalize_params' do
     expect(normalized_params[:attachments]).to be_empty
   end
 
+  it 'doesn’t duplicate calendar invite' do
+    params = default_params.merge(calendar_param).merge(
+      'attachment-count' => 2,
+      'attachment-1' => upload_1,
+      'attachment-2' => upload_invite
+    )
+    normalized_params = Griddler::Mailgun::Adapter.normalize_params(params)
+    expect(normalized_params[:attachments].length).to eq 2
+  end
+
   it 'gets sender from headers' do
     params = default_params.merge(From: '')
     normalized_params = Griddler::Mailgun::Adapter.normalize_params(params)
@@ -127,6 +137,14 @@ describe Griddler::Mailgun::Adapter, '.normalize_params' do
       filename: 'photo2.jpg',
       type: 'image/jpeg',
       tempfile: fixture_file('photo2.jpg')
+    )
+  end
+
+  def upload_invite
+    @upload_invite ||= ActionDispatch::Http::UploadedFile.new(
+      filename: 'invite.ics',
+      type: 'text/calendar',
+      tempfile: fixture_file('invite.ics')
     )
   end
 
