@@ -110,7 +110,7 @@ module Griddler
           ActionDispatch::Http::UploadedFile.new(
             filename: 'invite.ics',
             type: 'text/calendar',
-            tempfile: file
+            tempfile: file.open
           )
         ]
       end

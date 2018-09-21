@@ -124,6 +124,13 @@ describe Griddler::Mailgun::Adapter, '.normalize_params' do
     expect(normalized_params[:bcc]).to eq []
   end
 
+  it 'creates a useable tempfile from the body-calendar params' do
+    params = default_params.merge(calendar_param)
+    normalized_params = Griddler::Mailgun::Adapter.normalize_params(params)
+    ics_attachment = normalized_params[:attachments].first
+    expect(File.exist? ics_attachment).to eq true
+  end
+
   def upload_1
     @upload_1 ||= ActionDispatch::Http::UploadedFile.new(
       filename: 'photo1.jpg',
